@@ -4,8 +4,9 @@
 # Written by: 666xyzw
 
 use strict;
-use warnings;
-use diagnostics;
+# use warnings;
+# use diagnostics;
+
 
 
 sub getDomains{
@@ -16,7 +17,7 @@ sub getDomains{
     my @data = <$RH>;
     close($RH);
 
-    return \@data;
+    return @data;
 
 }
 
@@ -29,7 +30,7 @@ sub domainTest{
 
     my @curl_data = `curl -I --silent $p://$d`;
 
-    return \@curl_data;
+    return @curl_data;
 
 }
 
@@ -37,13 +38,11 @@ sub domainTest{
 sub responsParser{
     # parses the output from curl
 
-    my @response = @{$_[0]};
-    my $tested_domain = $_[1];
-    my $used_protocol = $_[2];
-   
+    my @response = $_[0];
+    my $used_protocol = $_[1];
+
     my ($http_status) = grep /HTTP\b.*$/, @response;
     
-    printf "DOMAIN: %s \n", $tested_domain;
     printf "\tHTTP Status: %s \n", $http_status;
     
 }
@@ -52,17 +51,38 @@ sub responsParser{
 sub check{
     # runs the checks and parser subroutine on the output
     
-    my @domain_list = @{$_[0]};
-    my $protocol = $_[1];
+    my @domain_list = @_;
+    my $protocol;
     my @server_response;
-    
-    foreach my $domain (@domain_list){
+    my $flag;
+
+    foreach my $domain (@domain_list[3..$#domain_list]){
+
+        $protocol = "https";
 
         @server_response = domainTest($domain, $protocol);
-        responsParser(@server_response, $domain, $protocol);
+        
+        ($flag) = grep /HTTP\b.*$/, @server_response;
+        
+        if ($flag eq ''){
+            
+            printf "DOMAIN: %s \n", $domain;
+            printf "\tDomain does not accept HTTPS connection!\n";
+            printf "\tTrying with HTTP connection!\n";
 
+            $protocol = "http";
+
+            @server_response = domainTest($domain, $protocol);
+            responsParser(@server_response, $protocol);
+
+        }else{
+
+            printf "DOMAIN: %s \n", $domain;
+            responsParser(@server_response, $protocol);
+
+        }
     }
 
 }
 
-check(getDomains(), $ARGV[0]);
+check(getDomains());
