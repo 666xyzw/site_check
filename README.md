@@ -10,7 +10,5 @@ To run the script first put the domain names you want to test in the `domains` f
 `domain3` are provided only as an example, please remove them and provide the apropriate domains.
 After writing the domains into the file, save it and open a terminal. In the terminal run it with `perl site_check`.
 
-In case you want to make it a stand alone executable, make the script an executable file wit the below command:
-`chmod 0700 site check`
-
+In case you want to make it a stand alone executable, make the script an executable file with `chmod 0700 site_check` 
 and after this copy it into your `bin` folder.
