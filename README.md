@@ -9,7 +9,7 @@ The script was tested ONLY on *nix systems. On Windows you can use WSL or the Gi
 ## Library Installation
 To install the LWP library start the `cpan` console (this is `perl's` own shell if you like) in a terminal; in
 case this is your first time running `cpan` go through the configuration wizzard, otherwise you can not use it.
-After you have confgiured cpan run the following command: `install LWP` and let `cpan` handle the rest. If in the end
+After you have configured cpan run the following command: `install LWP` and let `cpan` handle the rest. If in the end
 `perl` says that the `LWP` library has some dependencies, like the `HTTP` library, then install it/them like you tried
 to install the `LWP` library and after you have the dependencies on your system, re-run the `install LWP` command
 
