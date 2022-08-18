@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+# Tool to automate checking website availability
+# Written by: 666xyzw
+
+use strict;
+use LWP::UserAgent ();
+
+sub getDomains{
+    # Reads the domains from a file called "domains" into @data list
+
+    open my $RH, '<', "domains" || die "Can not open file!\n";
+    my @data = <$RH>;
+    close($RH);
+
+    return @data;
+
+}
+
+
+sub domainTest{
+    # Tests if the website is alive or not and returns the specific HTTP code
+
+    my $d = $_[0];  # holds the domain name
+    my $p = $_[1];  # holds the protocol
+
+    my $ua = LWP::UserAgent->new(protocols_allowed=>['http', 'https']);
+    my $response = $ua->get("$p://$d");
+       
+    return $response->status_line() . "\n";
+
+}
+
+
+sub check{
+    # runs the checks
+    
+    my @domain_list = @_;
+    my $protocol;
+    my $server_response;
+
+    foreach my $domain (@domain_list[3..$#domain_list]){
+
+        $protocol = "https";
+
+        $server_response = domainTest($domain, $protocol);
+        
+        if (grep  /.*certificate verify failed\b.*$/, $server_response){  
+           
+            printf "DOMAIN: %s \n", $domain;
+            printf "\tDomain does not accept HTTPS connection!\n";
+            printf "\tTrying with HTTP connection!\n";
+
+            $protocol = "http";
+
+            $server_response = domainTest($domain, $protocol);
+            printf "\tHTTP Status: %s \n", $server_response;
+
+            printf "\n";
+
+        }else{
+
+            printf "DOMAIN: %s \n", $domain;
+            printf "\tHTTPS Status: %s \n", $server_response;
+ 
+        }
+        
+    }
+
+}
+
+check(getDomains());
