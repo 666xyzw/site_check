@@ -15,13 +15,15 @@ to install the `LWP` library and after you have the dependencies on your system,
 
 ## Usage
 ### Single Domain
-To run the script for a single domain, just run the script specifying the domain name as an argument variable,
-like: `perl site_check domain_name`.
+To run the script for a single domain, just run the script specifying the domain name as an argument variable,like:
+
+`perl site_check domain_name`.
 
 ### Multi Domain
 To run the script for multiple domains, first put the domain names you want to test in the `domains` file; `domain1, domain2` and
 `domain3` are provided only as an example, please remove them and provide the apropriate domains.
-After writing the domains into the file, save it and open a terminal. In the terminal run it with `perl site_check`.
+After writing the domains into the file, save it and open a terminal. In the terminal run it with
+`perl site_check`.
 
-In case you want to make it a stand alone executable, make the script an executable file with `chmod 0700 site_check` 
-and after this copy it into your `bin` folder.
+In case you want to make it a stand alone executable, make the script an executable file with
+`chmod 0700 site_check` and after this copy it into your `bin` folder.
