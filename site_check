@@ -99,7 +99,9 @@ sub singleCheck{
 
 
 sub main {
-    
+    # Main function; checks if a system argument was given to the script or not
+    # If not then calls the multiCheck subroutine
+    # Else it calls the singleCheck subroutine for a single domain
     if ($ARGV[0] eq ''){
         
         multiCheck(getDomains());
