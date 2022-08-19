@@ -6,6 +6,7 @@
 use strict;
 use LWP::UserAgent ();
 
+
 sub getDomains{
     # Reads the domains from a file called "domains" into @data list
 
@@ -27,17 +28,48 @@ sub domainTest{
     my $ua = LWP::UserAgent->new(protocols_allowed=>['http', 'https']);
     my $response = $ua->get("$p://$d");
        
-    return $response->status_line() . "\n";
+    return $response->status_line();
 
 }
 
 
-sub check{
-    # runs the checks
+sub responseParse{
+    # Parses the response give by the web server and acts acordingly;
+    # If the server responds with an error "certificate verify failed"
+    # it means that the server does not communicate over HTTPS protocol
+    # and the check will be re-run over HTTP protocol.
+
+    my $response = $_[0];
+
+    if (grep  /.*certificate verify failed\b.*$/, $response){  
+        
+        printf "DOMAIN: %s \n", $_[1];
+        printf "\tDomain does not accept HTTPS connection!\n";
+        printf "\tTrying with HTTP connection!\n";
+
+        my $protocol = "http";
+
+        printf "\tHTTP Status: %s \n", domainTest($_[1], $protocol);
+
+        printf "\n";
+
+    }else{
+
+        printf "DOMAIN: %s \n", $_[1];
+        printf "\tHTTPS Status: %s \n", $response;
+        printf "\n";
+
+    }
+}
+
+
+sub multiCheck{
+    # Runs the check for multiple domains specified in the "domains" file
     
     my @domain_list = @_;
     my $protocol;
     my $server_response;
+    my $parsed_response;
 
     foreach my $domain (@domain_list[3..$#domain_list]){
 
@@ -45,28 +77,39 @@ sub check{
 
         $server_response = domainTest($domain, $protocol);
         
-        if (grep  /.*certificate verify failed\b.*$/, $server_response){  
-           
-            printf "DOMAIN: %s \n", $domain;
-            printf "\tDomain does not accept HTTPS connection!\n";
-            printf "\tTrying with HTTP connection!\n";
-
-            $protocol = "http";
-
-            $server_response = domainTest($domain, $protocol);
-            printf "\tHTTP Status: %s \n", $server_response;
-
-            printf "\n";
-
-        }else{
-
-            printf "DOMAIN: %s \n", $domain;
-            printf "\tHTTPS Status: %s \n", $server_response;
- 
-        }
-        
+        responseParse($server_response, $domain);
+               
     }
 
 }
 
-check(getDomains());
+
+sub singleCheck{
+    # Runs the check for a single domain specified in the command line
+
+    my $single_domain = $_[0];
+    my $protocol = "https";
+    my $server_response;
+
+    $server_response = domainTest($single_domain, $protocol);
+
+    responseParse($server_response, $single_domain);
+
+}
+
+
+sub main {
+    
+    if ($ARGV[0] eq ''){
+        
+        multiCheck(getDomains());
+
+    }else{
+
+        singleCheck($ARGV[0]);
+    }
+
+}
+
+
+main();
